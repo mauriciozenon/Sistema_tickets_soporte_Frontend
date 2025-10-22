@@ -18,6 +18,20 @@ import { NuevoTicket } from './pages/NuevoTicketPage';
   }
 />
 
+import Dashboard from './pages/DashboardPage';
+
+<Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute roles={['administrador']}>
+      <Layout>
+        <Dashboard />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
+
+
 function App() {
   return (
     <UserProvider>

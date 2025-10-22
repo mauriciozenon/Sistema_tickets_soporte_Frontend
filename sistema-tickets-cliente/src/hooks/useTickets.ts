@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-export const useTickets = (filtros: {
-  estado?: string;
-  prioridad?: string;
-  usuarioId?: number;
-  fecha?: string;
-}) => {
+export const useTickets = (
+  filtros: {
+    estado?: string;
+    prioridad?: string;
+    usuarioId?: number;
+    fecha?: string;
+  },
+  page: number,
+  limit: number = 10
+) => {
   const [tickets, setTickets] = useState([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,6 +23,8 @@ export const useTickets = (filtros: {
         if (filtros.prioridad) params.append('prioridad', filtros.prioridad);
         if (filtros.usuarioId) params.append('usuarioId', filtros.usuarioId.toString());
         if (filtros.fecha) params.append('fecha', filtros.fecha);
+        params.append('page', page.toString());
+        params.append('limit', limit.toString());
 
         const res = await axios.get(`http://localhost:3000/api/tickets?${params.toString()}`, {
           headers: {
@@ -25,7 +32,8 @@ export const useTickets = (filtros: {
           },
         });
 
-        setTickets(res.data);
+        setTickets(res.data.tickets);
+        setTotal(res.data.total);
       } catch (error) {
         console.error('Error al obtener tickets:', error);
       } finally {
@@ -34,7 +42,7 @@ export const useTickets = (filtros: {
     };
 
     fetchTickets();
-  }, [filtros]);
+  }, [filtros, page, limit]);
 
-  return { tickets, loading };
+  return { tickets, total, loading };
 };
